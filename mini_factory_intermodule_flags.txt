@@ -1,0 +1,34 @@
+External Flags (e.g. anything that two or more modules may care about knowing)
+
+VGR Driven:
+
+C700 (high) = puck delivered at MPO station, you can just RST this same bit when you've removed the puck and that could serve as an "all clear" flag for delivering a new puck.
+
+ 
+
+C701 (low) = The VGR is clear from the MPO pickup's path such that you don't need to worry about any collisions on picking up the puck.  This bit will go high anytime a collision could occur.  You may want to define a similar bit in your MPO space for the converse consideration, for now I'll just assume if C700 hasn't been RST then the MPO could potentially be working in that area.
+
+ 
+
+C702 (high) = The VGR has dropped a puck in the SSC color sensor.  Presumable this could be used for verifying a delivery from the train and knowing which bay to store this in for the HBW.  You could RST this bit low once you'd identified the color in the SSC.
+
+C703 (high) = The VGR has dropped a puck at the drain depot.  Only space for one so must be reset by train to load another puck there.
+
+
+
+SLD Driven:
+ 
+C1700 (high) = Puck ready for pickup in the Red chute (I can RST once picked up by the VGR).
+
+
+C1701 (high) = Puck ready for pickup in the White chute (I can RST once picked up by the VGR).
+
+C1702 (high) = Puck ready for pickup in the Blue chute (I can RST once picked up by the VGR).
+
+
+HBW Driven:
+
+C300 (high) = Puck ready for pickup in the conveyor on the Factory side.  VGR resets when puck is picked up and clear. 
+
+C301 (high) = Empty pallet ready to load in the conveyor on the factory side.  VGR to reset when this has been loaded.
+
