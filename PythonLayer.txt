@@ -1,0 +1,36 @@
+Tasks MPO:
+1. Begin processing 
+Flags MPO:
+Saw Enable MC440, C840
+Ready C841, MI441
+Reset MC442  C842
+Fault
+
+Variables MPO:
+Cook time MHR 440, V1600
+
+Tasks SLD:
+1. Reset
+2. Begin Sorting
+
+Flags SLD:
+White Puck
+Red Puck
+Blue Puck
+Ready
+Reset
+Fault
+
+
+Stages:
+
+Stage 1:
+
+HBW 
+VGR
+
+Stage 2 
+MPO
+
+Stage 3
+SLD
