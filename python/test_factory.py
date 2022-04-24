@@ -1,0 +1,57 @@
+
+"""This module tests the runability of factory.py"""
+
+import logging
+from time import sleep
+
+import utilities
+from job_data import JobData
+from factory.factory import FACTORY
+
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG) # sets default logging level for this module
+
+# Create formatter
+#formatter = logging.Formatter('[%(asctime)s] [%(levelname)-5s] [%(name)s] [%(threadName)s] - %(message)s')
+formatter = logging.Formatter('[%(asctime)s] [%(levelname)-5s] [%(name)s] - %(message)s')
+
+# Logger: create console handle
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)     # set logging level for console
+ch.setFormatter(formatter)
+logger.addHandler(ch)
+
+
+logging.getLogger("pymodbus").setLevel(logging.INFO)
+
+def main():
+    logger.info("Starting test factory")
+    config = utilities.load_env()
+    f = FACTORY(config['FACTORY_IP'], config['FACTORY_PORT'])
+    logger.info("Initialized")
+
+    f_status = f.status()
+    logger.info("Factorystatus %s", f_status)
+
+    job_data = JobData(job_id=254, order_id=100, color='red', cook_time=12, sliced=True, job_type = 2)
+    job_data.add_slot((2,3))
+    
+    if f_status == 'ready':
+        f.order(job_data)
+        f.update()
+        sleep(2)
+    else:
+        logger.error("Factory not ready")
+        return 1
+    
+    status = ""
+    while status != 'ready':
+        status = f.status()
+        logger.info("Factory Status: %s", status)
+        f.update()
+        sleep(1)
+        
+
+
+if __name__ == "__main__":
+    main()
