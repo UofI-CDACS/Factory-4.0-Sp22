@@ -13,8 +13,8 @@ class HBW():
         self.Task1 =        BIT(1, modbus) # Send
         self.Task2 =        BIT(2, modbus) # Receive
         self.Task3 =        BIT(3, modbus) # Reset
-        self.Task4 =        BIT(3, modbus) # Sort
-        self.Task5 =        BIT(3, modbus) # Manual Mode
+        self.Task4 =        BIT(4, modbus) # Sort
+        self.Task5 =        BIT(5, modbus) # Manual Mode
         self.row =       REGISTER(1, modbus) # row
         self.column =       REGISTER(2, modbus) # column
         self.row_new = REGISTER(3, modbus) # row new (sort)
@@ -51,7 +51,7 @@ class HBW():
         #Set task one and clear it (simuler to pressing HMI button)
         self.Task1.set()
         print("task 1 running and has row, column", x, y)
-        sleep(0.5)
+        sleep(0.25)
         return 1
 
     def StartTask2(self, x, y):
@@ -65,19 +65,18 @@ class HBW():
         sleep(0.25)
         self.Task2.clear()
         return 1
-    def StartTask3(self, row_start, column_start, row_finish, column_finish):
+    def StartTask4(self, row_start, column_start, row_finish, column_finish):
         """ Start Task 3
         Task 1 must be called first to clear a HBW slot, then this function could be
         called to relocate pallet for sorting/shuffling operations.
         """
         self.row.write(row_start)
         self.column.write(column_start)
-        self.row_relocate.write(row_finish)
-        self.column_relocate.write(column_finish)
+        self.row_new.write(row_finish)
+        self.column_new.write(column_finish)
         #Set task two and clear it (simuler to pressing HMI button)
-        self.Task3.set()
+        self.Task4.set()
         sleep(0.25)
-        self.Task3.clear()
         return 1
 
     def HBW_Status(self):

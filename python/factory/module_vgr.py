@@ -42,46 +42,46 @@ class VGR():
 
     def StartTask1(self):
         self.Task1.set()
-        sleep(1)
+        sleep(.25)
         return 1
 
     def StartTask2(self):
         self.Task2.set()
-        sleep(1)
+        sleep(.25)
         return 1
     def StartTask3(self):
         self.Task3.set()
-        sleep(1)
+        sleep(.25)
         return 1
     def StartTask4(self):
         self.Task4.set()
-        sleep(1)
+        sleep(.25)
         return 1
     def StartTask5(self):
         self.Task5.set()
-        sleep(1)
+        sleep(.25)
         return 1
     def StartTask6(self):
         self.Task6.set()
-        sleep(1)
+        sleep(.25)
         return 1
     def StartTask7(self):
         self.Task7.set()
-        sleep(1)
+        sleep(.25)
         return 1
     def StartTask8(self):
         self.Task8.set()
-        sleep(1)
+        sleep(.25)
         return 1
     def StartTask9(self):
         self.Task9.set()
-        sleep(1)
+        sleep(.25)
         return 1
     def StartTask10(self):
         self.Task10.set()
-        sleep(1)
+        sleep(.25)
         return 1
-
+    
     def VGR_Status(self):
         """ Show bit & register statuses """
         print("************************")

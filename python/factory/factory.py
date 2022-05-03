@@ -114,7 +114,16 @@ class FACTORY():
                 elif self._job_data.job_type == 2:
                     self._processing_thread = threading.Thread(target=self.restock_from_loading_bay)
                     self._processing_thread.start()      
-
+                elif self._job_data.job_type == 3:
+                    self._processing_thread = threading.Thread(target=self.load_train)
+                    self._processing_thread.start()  
+                elif self._job_data.job_type == 4:
+                    self._processing_thread = threading.Thread(target=self.restock_from_train)
+                    self._processing_thread.start()
+                elif self._job_data.job_type == 5:
+                    self._processing_thread = threading.Thread(target=self.warehouse_sort)
+                    self._processing_thread.start()
+                    
         elif self._factory_state == 'processing':
             self.logger.debug("Factory processing an order")
             if not self._processing_thread.is_alive():
@@ -132,7 +141,7 @@ class FACTORY():
             raise Exception("Invalid factory_state set")
 
         return self._factory_state
-
+        
     def order(self, job_data):
         """ Load processing job order """
         if self._factory_state == 'ready':
@@ -142,7 +151,137 @@ class FACTORY():
         else:
             self.logger.error("Factory not ready. Not accepting job")
             return 1
+    def warehouse_sort(self):
+        # Parse Job data
+        row_index = self._job_data.slot_x
+        column_index = self._job_data.slot_y
+        row_index_sort = self._job_data.slot_x_sort
+        column_index_sort = self._job_data.slot_y_sort
+        cook_time = self._job_data.cook_time
+        do_slice = self._job_data.sliced
+        self.logger.info("Factory process started")
+        self.logger.debug("Row: %d, Column: %d", row_index, column_index)
+        def stage_1(row_index_sort, column_index_sort, row_index, column_index):
+            print("Stage 1 entered")
+            hbw_ready_status = self._hbw.IsReady()
+            # Run _hbw
+            if hbw_ready_status == True:
+                print("_hbw Is Ready")
+                self._hbw.StartTask1(row_index, column_index) #_hbw STARTS
+            else:
+                print("_hbw Is Not Ready")
+            # Run _vgr and _hbw return
+            while True:
+                hbw_ready_status = self._hbw.IsReady()
+                if hbw_ready_status == True:
+                    self._hbw.StartTask4(row_index_sort, column_index_sort, row_index, column_index, ) 
+                    break
+                time.sleep(0.1)
+        def stage_2(row_index_sort, column_index_sort):
+            print("Stage 2 entered")
+            while True:
+                hbw_ready_status = self._hbw.IsReady()
+                if hbw_ready_status == True:
+                    self._hbw.StartTask2(row_index_sort, column_index_sort) 
+                    break
+                time.sleep(0.1)
+            while True:
+                hbw_ready_status = self._hbw.IsReady()
+                if hbw_ready_status == True:
+                    break
+                time.sleep(0.1)
+        stage_1(row_index_sort, column_index_sort, row_index, column_index)
+        stage_2(row_index_sort, column_index_sort)
+        
+    def restock_from_train(self):
+        # Parse Job data
+        row_index = self._job_data.slot_x
+        column_index = self._job_data.slot_y
+        cook_time = self._job_data.cook_time
+        do_slice = self._job_data.sliced
+        print("row index is:", row_index)       
+        print("column index:", column_index)
+        self.logger.info("Factory process started")
+        self.logger.debug("Row: %d, Column: %d", row_index, column_index)
 
+        def stage_1(row_index, column_index):
+            """
+            Stage 1
+            _hbw -> _vgr -> _mpo also _hbw return pallet
+            """
+            print("Stage 1 entered")
+            hbw_ready_status = self._hbw.IsReady()
+            self._vgr.Reset.set() #home position to reset encoder values
+            # Run _hbw
+            if hbw_ready_status == True:
+                print("_hbw Is Ready")
+                self._hbw.StartTask1(row_index, column_index) #_hbw STARTS
+            else:
+                print("_hbw Is Not Ready")
+            # Run _vgr and _hbw return
+            while True:
+                hbw_ready_status = self._hbw.IsReady()
+                vgr_ready_status = self._vgr.IsReady()
+                if hbw_ready_status == True and vgr_ready_status == True:
+                    self._vgr.StartTask6() 
+                    break
+                time.sleep(0.1)
+        def stage_2(row_index, column_index):
+            while True:
+                vgr_ready_status = self._vgr.IsReady()
+                if vgr_ready_status == True:
+                    self._vgr.StartTask9() 
+                    break
+                time.sleep(0.1)
+            while True:
+                vgr_ready_status = self._vgr.IsReady()
+                if vgr_ready_status == True: 
+                    self._hbw.StartTask2(row_index, column_index)#Return Pallet
+                    break
+                time.sleep(0.1)
+        
+        stage_1(row_index, column_index)
+        stage_2(row_index, column_index)
+        time.sleep(1)
+        
+    def load_train(self):
+        # Parse Job data
+        self.logger.info("Factory process started")
+        
+        def stage_1():
+            """
+            Stage 1
+            _hbw -> _vgr -> _mpo also _hbw return pallet
+            """
+            print("Stage 1 entered")
+            vgr_ready_status = self._vgr.IsReady()
+            # Run _hbw
+            if vgr_ready_status == True:
+                print("_vgr Is Ready")
+                self._vgr.StartTask5() #_hbw STARTS
+                time.sleep(0.5)
+            else:
+                print("_vgr Is Not Ready")
+                
+            # Run _vgr and _hbw return
+            while True:
+                vgr_ready_status = self._vgr.IsReady()
+                if vgr_ready_status == True:
+                    self._vgr.StartTask10() 
+                    time.sleep(0.5)
+                    break
+                time.sleep(0.1)
+                            # Run _vgr and _hbw return
+            while True:
+                vgr_ready_status = self._vgr.IsReady()
+                if vgr_ready_status == True:
+                    self._vgr.Reset.set() 
+                    time.sleep(0.5)
+                    break
+                time.sleep(0.1)
+        
+        stage_1()
+                
     def restock_from_loading_bay(self):
         # Parse Job data
         row_index = self._job_data.slot_x
@@ -161,6 +300,7 @@ class FACTORY():
             """
             print("Stage 1 entered")
             hbw_ready_status = self._hbw.IsReady()
+            self._vgr.Reset.set() #home position to reset encoder values
             # Run _hbw
             if hbw_ready_status == True:
                 print("_hbw Is Ready")
@@ -171,9 +311,10 @@ class FACTORY():
             # Run _vgr and _hbw return
             while True:
                 hbw_ready_status = self._hbw.IsReady()
-                if hbw_ready_status == True:
+                vgr_ready_status = self._vgr.IsReady()
+                if hbw_ready_status == True and vgr_ready_status == True:
                     self._vgr.StartTask5() 
-                    time.sleep(1)
+                    time.sleep(0.5)
                     break
                 time.sleep(0.1)
         def stage_2(row_index, column_index):
@@ -181,20 +322,20 @@ class FACTORY():
                 vgr_ready_status = self._vgr.IsReady()
                 if vgr_ready_status == True:
                     self._vgr.StartTask9() 
-                    time.sleep(1)
+                    time.sleep(0.5)
                     break
                 time.sleep(0.1)
             while True:
                 vgr_ready_status = self._vgr.IsReady()
                 if vgr_ready_status == True: 
                     self._hbw.StartTask2(row_index, column_index)#Return Pallet
-                    time.sleep(1)
+                    time.sleep(0.5)
                     break
                 time.sleep(0.1)
         
         stage_1(row_index, column_index)
         stage_2(row_index, column_index)
-                
+        
     def process_order(self):
         """ Main order sequence for factory
         Expects self._job_data to be populated
@@ -220,7 +361,7 @@ class FACTORY():
             if hbw_ready_status == True:
                 print("_hbw Is Ready")
                 self._hbw.StartTask1(row_index, column_index) #_hbw STARTS
-                time.sleep(1)
+                time.sleep(.25)
             else:
                 print("_hbw Is Not Ready")
 
@@ -279,19 +420,6 @@ class FACTORY():
                     time.sleep(1)
                     break
                 time.sleep(0.1)    
-                #mpo_ready_status = self._mpo.IsReady()
-                #if mpo_ready_status == True:
-                #    print("Time to start the SLD task")
-                #    break
-                #time.sleep(0.1)
-                
-                #mpo_start_light = self._mpo.StartSensorStatus()
-                #if mpo_start_light == False:
-                #    print("Starting _mpo task")
-                #    time.sleep(1)
-                #    self._mpo.StartTask1()#Add values to change
-                #    break
-                #time.sleep(0.1)
 
         def stage_3():
             """
@@ -311,10 +439,6 @@ class FACTORY():
         stage_3()
         self._job_data = None # Clear job data that just completed
         return
-
-
-    def restock_from_train(self):
-        pass
 
 
 #*****************************

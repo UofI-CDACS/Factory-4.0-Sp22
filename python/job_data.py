@@ -51,6 +51,8 @@ class JobData():
         """
         self.slot_x = slot[0]
         self.slot_y = slot[1]
+        self.slot_x_sort = slot[2]
+        self.slot_y_sort = slot[3]
 
     def job_type(self):
         """ Get job type to allow the correct process to be called by factory.py
