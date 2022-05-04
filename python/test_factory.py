@@ -37,7 +37,7 @@ def main():
     logger.info("Factorystatus %s", f_status)
     
 # 1.)  Process order.  Original job_type processing a puck through the factory from the HBW and delivering to the loading bay.
-    job_data = JobData(job_id=254, order_id=100, color='blue', cook_time=12, sliced=True, job_type = 1)
+    job_data = JobData(job_id=254, order_id=100, color='blue', cook_time=5, sliced=False, job_type = 1)
     job_data.add_slot((1,3,0,0))
 
 # 2.) Restock from loading bay test, blue pallet on row 1 column 3 should be empty before starting and should be a puck in the loading bay.  
