@@ -18,7 +18,7 @@ class JobData():
             raise AttributeError("Color is not a string")
 
         if self._validate_int(cook_time):
-            self.cook_time = cook_time
+            self.cook_time = cook_time * 1000
 
         if isinstance(sliced, bool):
             self.sliced = sliced

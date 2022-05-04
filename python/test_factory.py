@@ -29,8 +29,11 @@ def main():
     config = utilities.load_env()
     f = FACTORY(config['FACTORY_IP'], config['FACTORY_PORT'])
     logger.info("Initialized")
+    
 
     f_status = f.status()
+
+    
     logger.info("Factorystatus %s", f_status)
     
 # 1.)  Process order.  Original job_type processing a puck through the factory from the HBW and delivering to the loading bay.

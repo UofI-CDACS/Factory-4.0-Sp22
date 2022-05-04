@@ -1,6 +1,8 @@
 
 
+from ast import BitAnd
 from factory.bit import BIT             # Modbus Bit
+from factory.register import REGISTER
 from time import sleep
 
 
@@ -14,9 +16,12 @@ class MPO():
         self.status_manual  = BIT(451, modbus) #manual control mode
         self.status_reset   = BIT(452, modbus) #reset
 
+        self.sld_done = BIT(820,modbus)
+
+        self.cook_time = REGISTER(440,modbus)
         self.oven_ligh_status = BIT(500, modbus) #modbus input 400 0ven on light
         self.saw_status =   BIT(501, modbus)
-        self.ready_status = BIT(502, modbus)
+        self.ready_status = BIT(441, modbus)
         self.fault_status = BIT(503, modbus)
         self.light_start =  BIT(504, modbus)
         self.light_end =    BIT(505, modbus)
@@ -35,6 +40,7 @@ class MPO():
         Start cooking operation
         """
         self.Task1.set()
+        self.Task1.clear()
         sleep(1)
         
         return 1

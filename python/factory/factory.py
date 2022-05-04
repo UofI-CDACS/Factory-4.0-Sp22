@@ -399,6 +399,10 @@ class FACTORY():
             # Run _hbw
             if mpo_ready_status == True:
                 print("_mpo Is Ready")
+
+                self._mpo.cook_time.write(cook_time)
+                self. _mpo.saw_status.write(do_slice)
+
                 self._mpo.StartTask1() 
                 print("mpo task 1 started")
                 time.sleep(1)
@@ -408,8 +412,9 @@ class FACTORY():
             while True:
                 # Currently MC450, MPO_Task1, resets after puck put in white red blue slot in SLD and this is used as metric for done
                 # This can be further defined later to give factory.py better visibility of where the puck is, etc.
+                # This is now tied to MC 820 which will indicate if the SLD is done
                 sld_done = self._mpo.Task1.read()
-                if sld_done == False:
+                if self._mpo.sld_done.read() == False:
                     print("Puck ready for pickup")
                     if column_index == 1: #red puck
                         self._vgr.StartTask3()
