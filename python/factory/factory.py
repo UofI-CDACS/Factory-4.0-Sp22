@@ -407,7 +407,7 @@ class FACTORY():
                 print("mpo task 1 started")
                 time.sleep(1)
             else:
-                print("_hbw Is Not Ready")
+                print("_mpo Is Not Ready")
                 
             while True:
                 # Currently MC450, MPO_Task1, resets after puck put in white red blue slot in SLD and this is used as metric for done
